@@ -7,23 +7,21 @@ function convert(geojson) {
         if (!geojson.features[i].properties) geojson.features[i].properties = {};
         geojson.features[i].properties._id = hat();
 
-
         var feature = geojson.features[i];
-        if (feature.geometry.type === 'Polygon') {
-            var inside = _makeLayer(feature, sourceId);
-            if (layer instanceof Error) return layer;
+        if (feature.geometry.type === 'LineString') {
+            var layer = _makeLayer(feature, sourceId, 'LineString');
+            layers.push(layer);
+
+        } else if (feature.geometry.type === 'Polygon') {
+            var inside = _makeLayer(feature, sourceId, 'Polygon');
             layers.push(inside);
 
             // Background: https://github.com/mapbox/simplespec-to-gl-style/issues/2
             // `type: fill` does not support stroke properties
-            feature.geometry.type = 'LineString';
-            var outside = _makeLayer(feature);
-            if (layer instanceof Error) return layer;
+            var outside = _makeLayer(feature, sourceId, 'LineString');
             layers.push(outside);
         } else {
-            var layer = _makeLayer(feature, sourceId);
-            if (layer instanceof Error) return layer;
-            layers.push(layer);
+            return new Error('Unsupported geometry type');
         }
     }
 
@@ -39,11 +37,9 @@ function convert(geojson) {
     return style;
 }
 
-function _makeLayer(feature, sourceId) {
-    if (feature.geometry.type !== 'LineString' && feature.geometry.type !== 'Polygon') return new Error('Unsupported geometry type');
-
+function _makeLayer(feature, sourceId, geometry) {
     var layer;
-    if (feature.geometry.type === 'LineString') {
+    if (geometry === 'LineString') {
         layer = {
             type: 'line',
             source: sourceId,
@@ -59,7 +55,7 @@ function _makeLayer(feature, sourceId) {
                 feature.properties._id
             ]
         };
-    } else if (feature.geometry.type === 'Polygon') {
+    } else if (geometry === 'Polygon') {
         layer = {
             type: 'fill',
             source: sourceId,
