@@ -9,7 +9,6 @@
   "author": "Bobby Sudekum",
   "license": "ISC",
   "dependencies": {
-    "geojsonhint": "^1.1.0",
     "hat": "0.0.3"
   },
   "devDependencies": {

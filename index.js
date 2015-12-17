@@ -1,10 +1,6 @@
-var geojsonhint = require('geojsonhint');
 var hat = require('hat');
 
 function convert(geojson) {
-    var check = geojsonhint.hint(geojson);
-    if (check.length > 0) return check;
-
     var layers = [];
     for (var i = 0; i < geojson.features.length; i++) {
         if (!geojson.features[i].properties) geojson.features[i].properties = {};
