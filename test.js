@@ -11,13 +11,11 @@ test('valid', function(t) {
     var style = simpleToGL(validFeatureCollection);
     t.deepEqual(style.version, 8, 'Version should be 8');
 
-    var p = 0;
     for (var key in style.sources) {
        var source = style.sources[key];
        for (var i = 0; i < source.data.features.length; i++) {
            t.deepEqual(style.layers[i].filter[2], source.data.features[i].properties._id, 'ids match between geojson source and layer')
        }
-       p++;
     }
 
     t.deepEqual(style.layers.length, 3, 'Should create 3 layers: 1 for LineString, and 2 for polygon');
@@ -41,13 +39,11 @@ test('valid with no properties', function(t) {
     var style = simpleToGL(validFeatureCollectionWithNoProperties);
     t.deepEqual(style.version, 8, 'Version should be 8');
 
-    var p = 0;
     for (var key in style.sources) {
        var source = style.sources[key];
        for (var i = 0; i < source.data.features.length; i++) {
            t.deepEqual(style.layers[i].filter[2], source.data.features[i].properties._id, 'ids match between geojson source and layer')
        }
-       p++;
     }
 
     t.deepEqual(style.layers[0].paint['line-color'], '#555555', 'LineString line-color is default value');
@@ -68,13 +64,11 @@ test('valid single feature', function(t) {
     var style = simpleToGL(singleGeoJSONFeature);
     t.deepEqual(style.version, 8, 'Version should be 8');
 
-    var p = 0;
     for (var key in style.sources) {
        var source = style.sources[key];
        for (var i = 0; i < style.layers.length; i++) {
            t.deepEqual(style.layers[i].filter[2], source.data.properties._id, 'ids match between geojson source and layer');
        }
-       p++;
     }
 
     t.deepEqual(style.layers[0].paint['fill-color'], '#555555', 'Polyong fill-color is default value');
