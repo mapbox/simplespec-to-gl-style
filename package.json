@@ -1,0 +1,18 @@
+{
+  "name": "simplespec-to-gl-style",
+  "version": "0.0.1",
+  "description": "Converts GeoJSON styled with simplestyle-spec to a GL Style",
+  "main": "index.js",
+  "scripts": {
+    "test": "tape ./test.js"
+  },
+  "author": "Bobby Sudekum",
+  "license": "ISC",
+  "dependencies": {
+    "geojsonhint": "^1.1.0",
+    "hat": "0.0.3"
+  },
+  "devDependencies": {
+    "tape": "^4.2.2"
+  }
+}
