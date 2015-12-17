@@ -2,13 +2,15 @@ var hat = require('hat');
 
 function convert(geojson) {
     var layers = [];
+    var sourceId = hat();
     for (var i = 0; i < geojson.features.length; i++) {
         if (!geojson.features[i].properties) geojson.features[i].properties = {};
         geojson.features[i].properties._id = hat();
 
+
         var feature = geojson.features[i];
         if (feature.geometry.type === 'Polygon') {
-            var inside = _makeLayer(feature);
+            var inside = _makeLayer(feature, sourceId);
             if (layer instanceof Error) return layer;
             layers.push(inside);
 
@@ -19,13 +21,13 @@ function convert(geojson) {
             if (layer instanceof Error) return layer;
             layers.push(outside);
         } else {
-            var layer = _makeLayer(feature);
+            var layer = _makeLayer(feature, sourceId);
             if (layer instanceof Error) return layer;
             layers.push(layer);
         }
     }
 
-    var sources = _makeSource(geojson);
+    var sources = _makeSource(geojson, sourceId);
 
     var style = {
         version: 8,
@@ -37,14 +39,14 @@ function convert(geojson) {
     return style;
 }
 
-function _makeLayer(feature) {
+function _makeLayer(feature, sourceId) {
     if (feature.geometry.type !== 'LineString' && feature.geometry.type !== 'Polygon') return new Error('Unsupported geometry type');
 
     var layer;
     if (feature.geometry.type === 'LineString') {
         layer = {
-            source: 'geojson',
             type: 'line',
+            source: sourceId,
             id: feature.properties._id,
             paint: {
                 'line-color': 'stroke' in feature.properties ? feature.properties.stroke : '#555555',
@@ -59,8 +61,8 @@ function _makeLayer(feature) {
         };
     } else if (feature.geometry.type === 'Polygon') {
         layer = {
-            source: 'geojson',
             type: 'fill',
+            source: sourceId,
             id: feature.properties._id,
             paint: {
                 'fill-color': 'fill' in feature.properties ? feature.properties.fill : '#555555',
@@ -76,9 +78,9 @@ function _makeLayer(feature) {
     return layer;
 }
 
-function _makeSource(geojson) {
+function _makeSource(geojson, sourceId) {
     var sources = {
-        geojson: {
+        [sourceId]: {
             type: 'geojson',
             data: geojson
         }
