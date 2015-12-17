@@ -22,7 +22,7 @@ function convert(geojson) {
         sources: sources,
         layers: layers,
         glyphs:'mapbox://fonts/mapbox/{fontstack}/{range}.pbf'
-    }
+    };
 
     return style;
 }
