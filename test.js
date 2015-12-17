@@ -28,7 +28,7 @@ test('valid', function(t) {
     t.deepEqual(style.layers[1].paint['fill-color'], validFeatureCollection.features[1].properties['fill'], 'Polyong fill-color the same');
     t.deepEqual(style.layers[1].paint['fill-opacity'], validFeatureCollection.features[1].properties['fill-opacity'], 'Polyong fill-opacity the same');
 
-    t.deepEqual(style.layers[0].source, style.layers[1].source, 'Sources should be the same')
+    t.deepEqual(style.layers[0].source, style.layers[1].source, 'Sources should be the same');
     t.end();
 });
 
