@@ -57,7 +57,7 @@ function _makeLayer(feature) {
                 'fill-opacity': feature.properties['fill-opacity'] || 1,
                 'line-color': feature.properties.stroke || 1,
                 'line-width': feature.properties['stroke-width'] || 1,
-                'line-opactiy': feature.properties['stroke-opacity'] || 1
+                'line-opacity': feature.properties['stroke-opacity'] || 1
             },
             filter: [
                 '==',

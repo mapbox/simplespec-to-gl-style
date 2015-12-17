@@ -19,7 +19,7 @@ test('valid', function(t) {
 
     t.deepEqual(style.layers[1].paint['line-color'], validFeatureCollection.features[1].properties['stroke'], 'Polyong line-color the same');
     t.deepEqual(style.layers[1].paint['line-width'], validFeatureCollection.features[1].properties['stroke-width'], 'Polyong line-width the same');
-    t.deepEqual(style.layers[1].paint['line-opactiy'], validFeatureCollection.features[1].properties['stroke-opacity'], 'Polyong line-opacity the same');
+    t.deepEqual(style.layers[1].paint['line-opacity'], validFeatureCollection.features[1].properties['stroke-opacity'], 'Polyong line-opacity the same');
     t.deepEqual(style.layers[1].paint['fill-color'], validFeatureCollection.features[1].properties['fill'], 'Polyong fill-color the same');
     t.deepEqual(style.layers[1].paint['fill-opacity'], validFeatureCollection.features[1].properties['fill-opacity'], 'Polyong fill-opacity the same');
 
