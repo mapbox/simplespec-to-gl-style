@@ -19,15 +19,18 @@ test('valid', function(t) {
        p++;
     }
 
+    t.deepEqual(style.layers.length, 3, 'Should create 3 layers: 1 for LineString, and 2 for polygon');
+
     t.deepEqual(style.layers[0].paint['line-color'], validFeatureCollection.features[0].properties['stroke'], 'LineString line-color the same');
     t.deepEqual(style.layers[0].paint['line-width'], validFeatureCollection.features[0].properties['stroke-width'], 'LineString line-width the same');
     t.deepEqual(style.layers[0].paint['line-opacity'], validFeatureCollection.features[0].properties['stroke-opacity'], 'LineString line-opacity the same');
 
-    t.deepEqual(style.layers[1].paint['line-color'], validFeatureCollection.features[1].properties['stroke'], 'Polyong line-color the same');
-    t.deepEqual(style.layers[1].paint['line-width'], validFeatureCollection.features[1].properties['stroke-width'], 'Polyong line-width the same');
-    t.deepEqual(style.layers[1].paint['line-opacity'], validFeatureCollection.features[1].properties['stroke-opacity'], 'Polyong line-opacity the same');
     t.deepEqual(style.layers[1].paint['fill-color'], validFeatureCollection.features[1].properties['fill'], 'Polyong fill-color the same');
     t.deepEqual(style.layers[1].paint['fill-opacity'], validFeatureCollection.features[1].properties['fill-opacity'], 'Polyong fill-opacity the same');
+
+    t.deepEqual(style.layers[2].paint['line-color'], validFeatureCollection.features[1].properties['stroke'], 'LineString line-color the same');
+    t.deepEqual(style.layers[2].paint['line-width'], validFeatureCollection.features[1].properties['stroke-width'], 'LineString line-width the same');
+    t.deepEqual(style.layers[2].paint['line-opacity'], validFeatureCollection.features[1].properties['stroke-opacity'], 'LineString line-opacity the same');
 
     t.deepEqual(style.layers[0].source, style.layers[1].source, 'Sources should be the same');
     t.end();
@@ -37,19 +40,25 @@ test('valid with no properties', function(t) {
     var style = simpleToGL(validFeatureCollectionWithNoProperties);
     t.deepEqual(style.version, 8, 'Version should be 8');
 
-    for (var i = 0; i < style.sources.geojson.data.features.length; i++) {
-        t.deepEqual(style.layers[i].filter[2], style.sources.geojson.data.features[i].properties._id, 'ids match between geojson source and layer')
+    var p = 0;
+    for (var key in style.sources) {
+       var source = style.sources[key];
+       for (var i = 0; i < source.data.features.length; i++) {
+           t.deepEqual(style.layers[i].filter[2], source.data.features[i].properties._id, 'ids match between geojson source and layer')
+       }
+       p++;
     }
 
     t.deepEqual(style.layers[0].paint['line-color'], '#555555', 'LineString line-color is default value');
     t.deepEqual(style.layers[0].paint['line-opacity'], 1.0, 'LineString line-opacity is default value');
     t.deepEqual(style.layers[0].paint['line-width'], 2.0, 'LineString line-width is default value');
 
-    t.deepEqual(style.layers[1].paint['line-color'], '#555555', 'Polyong line-color is default value');
-    t.deepEqual(style.layers[1].paint['line-opacity'], 1.0, 'Polyong line-opacity is default value');
-    t.deepEqual(style.layers[1].paint['line-width'], 2.0, 'Polyong line-width is default value');
     t.deepEqual(style.layers[1].paint['fill-color'], '#555555', 'Polyong fill-color is default value');
     t.deepEqual(style.layers[1].paint['fill-opacity'], 0.5, 'Polyong fill-opacity is default value');
+
+    t.deepEqual(style.layers[2].paint['line-color'], '#555555', 'LineString line-color is default value');
+    t.deepEqual(style.layers[2].paint['line-opacity'], 1.0, 'LineString line-opacity is default value');
+    t.deepEqual(style.layers[2].paint['line-width'], 2.0, 'LineString line-width is default value');
 
     t.end();
 });
