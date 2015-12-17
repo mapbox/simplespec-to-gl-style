@@ -33,9 +33,9 @@ function _makeLayer(feature) {
             type: 'line',
             id: feature.properties._id,
             paint: {
-                'line-color': feature.properties.stroke || '#ddd',
-                'line-width': feature.properties['stroke-width'] || '#ddd',
-                'line-opacity': feature.properties['stroke-opacity'] || 1
+                'line-color': 'stroke' in feature.properties ? feature.properties.stroke : '#555555',
+                'line-opacity': 'stroke-opacity' in feature.properties ? feature.properties['stroke-opacity'] : 1.0,
+                'line-width': 'stroke-width' in feature.properties ? feature.properties['stroke-width'] : 2
             },
             filter: [
                 '==',
@@ -49,11 +49,11 @@ function _makeLayer(feature) {
             type: 'fill',
             id: feature.properties._id,
             paint: {
-                'fill-color': feature.properties.fill  || '#ddd',
-                'fill-opacity': feature.properties['fill-opacity'] || 1,
-                'line-color': feature.properties.stroke || 1,
-                'line-width': feature.properties['stroke-width'] || 1,
-                'line-opacity': feature.properties['stroke-opacity'] || 1
+                'line-color': 'stroke' in feature.properties ? feature.properties.stroke : '#555555',
+                'line-opacity': 'stroke-opacity' in feature.properties ? feature.properties['stroke-opacity'] : 1.0,
+                'line-width': 'stroke-width' in feature.properties ? feature.properties['stroke-width'] : 2.0,
+                'fill-color': 'fill' in feature.properties ? feature.properties.fill : '#555555',
+                'fill-opacity': 'fill-opacity' in feature.properties ? feature.properties['fill-opacity'] : 0.5
             },
             filter: [
                 '==',
