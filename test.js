@@ -26,13 +26,6 @@ test('valid', function(t) {
     t.end();
 });
 
-
-test('invalid GeoJSON', function(t) {
-    var style = simpleToGL(invalidFeatureCollection);
-    t.deepEqual(style[0].message, '"features" property required');
-    t.end();
-});
-
 test('invalid point', function(t) {
     var style = simpleToGL(point);
     t.deepEqual(style.message, 'Unsupported geometry type');
