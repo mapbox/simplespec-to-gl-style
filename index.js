@@ -6,16 +6,17 @@ function convert(geojson) {
     if (check.length > 0) return check;
 
     var layers = [];
+    var sourceId = hat();
     for (var i = 0; i < geojson.features.length; i++) {
         if (!geojson.features[i].properties) geojson.features[i].properties = {};
         geojson.features[i].properties._id = hat();
 
-        var layer = _makeLayer(geojson.features[i]);
+        var layer = _makeLayer(geojson.features[i], sourceId);
         if (layer instanceof Error) return layer;
         layers.push(layer);
     }
 
-    var sources = _makeSource(geojson);
+    var sources = _makeSource(geojson, sourceId);
 
     var style = {
         version: 8,
@@ -27,14 +28,14 @@ function convert(geojson) {
     return style;
 }
 
-function _makeLayer(feature) {
+function _makeLayer(feature, sourceId) {
     if (feature.geometry.type !== 'LineString' && feature.geometry.type !== 'Polygon') return new Error('Unsupported geometry type');
 
     var layer;
     if (feature.geometry.type === 'LineString') {
         layer = {
-            source: 'geojson',
             type: 'line',
+            source: sourceId,
             id: feature.properties._id,
             paint: {
                 'line-color': feature.properties.stroke || '#ddd',
@@ -49,8 +50,8 @@ function _makeLayer(feature) {
         };
     } else if (feature.geometry.type === 'Polygon') {
         layer = {
-            source: 'geojson',
             type: 'fill',
+            source: sourceId,
             id: feature.properties._id,
             paint: {
                 'fill-color': feature.properties.fill  || '#ddd',
@@ -69,9 +70,9 @@ function _makeLayer(feature) {
     return layer;
 }
 
-function _makeSource(geojson) {
+function _makeSource(geojson, sourceId) {
     var sources = {
-        geojson: {
+        [sourceId]: {
             type: 'geojson',
             data: geojson
         }

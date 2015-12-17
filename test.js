@@ -9,8 +9,13 @@ test('valid', function(t) {
     var style = simpleToGL(validFeatureCollection);
     t.deepEqual(style.version, 8, 'Version should be 8');
 
-    for (var i = 0; i < style.sources.geojson.data.features.length; i++) {
-        t.deepEqual(style.layers[i].filter[2], style.sources.geojson.data.features[i].properties._id, 'ids match between geojson source and layer')
+    var p = 0;
+    for (var key in style.sources) {
+       var source = style.sources[key];
+       for (var i = 0; i < source.data.features.length; i++) {
+           t.deepEqual(style.layers[i].filter[2], source.data.features[i].properties._id, 'ids match between geojson source and layer')
+       }
+       p++;
     }
 
     t.deepEqual(style.layers[0].paint['line-color'], validFeatureCollection.features[0].properties['stroke'], 'LineString line-color the same');
@@ -23,6 +28,7 @@ test('valid', function(t) {
     t.deepEqual(style.layers[1].paint['fill-color'], validFeatureCollection.features[1].properties['fill'], 'Polyong fill-color the same');
     t.deepEqual(style.layers[1].paint['fill-opacity'], validFeatureCollection.features[1].properties['fill-opacity'], 'Polyong fill-opacity the same');
 
+    t.deepEqual(style.layers[0].source, style.layers[1].source, 'Sources should be the same')
     t.end();
 });
 
