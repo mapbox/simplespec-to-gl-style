@@ -3,22 +3,43 @@ var hat = require('hat');
 function convert(geojson) {
     var layers = [];
     var sourceId = hat();
-    for (var i = 0; i < geojson.features.length; i++) {
-        if (!geojson.features[i].properties) geojson.features[i].properties = {};
-        geojson.features[i].properties._id = hat();
+    if (geojson.features && geojson.features.length) {
+        for (var i = 0; i < geojson.features.length; i++) {
+            if (!geojson.features[i].properties) geojson.features[i].properties = {};
+            geojson.features[i].properties._id = hat();
 
-        var feature = geojson.features[i];
-        if (feature.geometry.type === 'LineString') {
-            var layer = _makeLayer(feature, sourceId, 'LineString');
+            var feature = geojson.features[i];
+            if (feature.geometry.type === 'LineString') {
+                var layer = _makeLayer(feature, sourceId, 'LineString');
+                layers.push(layer);
+
+            } else if (feature.geometry.type === 'Polygon') {
+                var inside = _makeLayer(feature, sourceId, 'Polygon');
+                layers.push(inside);
+
+                // Background: https://github.com/mapbox/simplespec-to-gl-style/issues/2
+                // `type: fill` does not support stroke properties
+                var outside = _makeLayer(feature, sourceId, 'LineString');
+                layers.push(outside);
+            } else {
+                return new Error('Unsupported geometry type');
+            }
+        }
+    } else {
+        if (!geojson.properties) geojson.properties = {};
+        geojson.properties._id = hat();
+
+        if (geojson.geometry.type === 'LineString') {
+            var layer = _makeLayer(geojson, sourceId, 'LineString');
             layers.push(layer);
 
-        } else if (feature.geometry.type === 'Polygon') {
-            var inside = _makeLayer(feature, sourceId, 'Polygon');
+        } else if (geojson.geometry.type === 'Polygon') {
+            var inside = _makeLayer(geojson, sourceId, 'Polygon');
             layers.push(inside);
 
             // Background: https://github.com/mapbox/simplespec-to-gl-style/issues/2
             // `type: fill` does not support stroke properties
-            var outside = _makeLayer(feature, sourceId, 'LineString');
+            var outside = _makeLayer(geojson, sourceId, 'LineString');
             layers.push(outside);
         } else {
             return new Error('Unsupported geometry type');
