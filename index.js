@@ -6,9 +6,23 @@ function convert(geojson) {
         if (!geojson.features[i].properties) geojson.features[i].properties = {};
         geojson.features[i].properties._id = hat();
 
-        var layer = _makeLayer(geojson.features[i]);
-        if (layer instanceof Error) return layer;
-        layers.push(layer);
+        var feature = geojson.features[i];
+        if (feature.geometry.type === 'Polygon') {
+            var inside = _makeLayer(feature);
+            if (layer instanceof Error) return layer;
+            layers.push(inside);
+
+            // Background: https://github.com/mapbox/simplespec-to-gl-style/issues/2
+            // `type: fill` does not support stroke properties
+            feature.geometry.type = 'LineString';
+            var outside = _makeLayer(feature);
+            if (layer instanceof Error) return layer;
+            layers.push(outside);
+        } else {
+            var layer = _makeLayer(feature);
+            if (layer instanceof Error) return layer;
+            layers.push(layer);
+        }
     }
 
     var sources = _makeSource(geojson);
@@ -49,9 +63,6 @@ function _makeLayer(feature) {
             type: 'fill',
             id: feature.properties._id,
             paint: {
-                'line-color': 'stroke' in feature.properties ? feature.properties.stroke : '#555555',
-                'line-opacity': 'stroke-opacity' in feature.properties ? feature.properties['stroke-opacity'] : 1.0,
-                'line-width': 'stroke-width' in feature.properties ? feature.properties['stroke-width'] : 2.0,
                 'fill-color': 'fill' in feature.properties ? feature.properties.fill : '#555555',
                 'fill-opacity': 'fill-opacity' in feature.properties ? feature.properties['fill-opacity'] : 0.5
             },
