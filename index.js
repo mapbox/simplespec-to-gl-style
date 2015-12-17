@@ -1,43 +1,44 @@
 var hat = require('hat');
 
 function convert(geojson) {
-    var layers = [];
     var sourceId = hat();
-    for (var i = 0; i < geojson.features.length; i++) {
-        if (!geojson.features[i].properties) geojson.features[i].properties = {};
-        geojson.features[i].properties._id = hat();
-
-        var feature = geojson.features[i];
-        if (feature.geometry.type === 'LineString') {
-            var layer = _makeLayer(feature, sourceId, 'LineString');
-            layers.push(layer);
-
-        } else if (feature.geometry.type === 'Polygon') {
-            var inside = _makeLayer(feature, sourceId, 'Polygon');
-            layers.push(inside);
-
-            // Background: https://github.com/mapbox/simplespec-to-gl-style/issues/2
-            // `type: fill` does not support stroke properties
-            var outside = _makeLayer(feature, sourceId, 'LineString');
-            layers.push(outside);
-        } else {
-            return new Error('Unsupported geometry type');
-        }
-    }
-
-    var sources = _makeSource(geojson, sourceId);
 
     var style = {
         version: 8,
-        sources: sources,
-        layers: layers,
+        sources: makeSource(geojson, sourceId),
+        layers: addLayers(geojson, sourceId, []),
         glyphs:'mapbox://fonts/mapbox/{fontstack}/{range}.pbf'
     };
 
     return style;
 }
 
-function _makeLayer(feature, sourceId, geometry) {
+function addLayers(geojson, sourceId, layers) {
+    switch (geojson.type) {
+        case 'FeatureCollection':
+            geojson.features.forEach(function (feature) { addLayers(feature, sourceId, layers); });
+            break;
+        default: throw new Error('unknown or unsupported GeoJSON type');
+        case 'Feature':
+            switch (geojson.geometry.type) {
+                case 'LineString':
+                    if (!geojson.properties) geojson.properties = {};
+                    geojson.properties._id = hat();
+                    layers.push(makeLayer(geojson, sourceId, 'LineString'));
+                    break;
+                case 'Polygon':
+                    if (!geojson.properties) geojson.properties = {};
+                    geojson.properties._id = hat();
+                    layers.push(makeLayer(geojson, sourceId, 'LineString'));
+                    layers.push(makeLayer(geojson, sourceId, 'Polygon'));
+                    break;
+                default: throw new Error('unknown or unsupported GeoJSON geometry type');
+            }
+    }
+    return layers;
+}
+
+function makeLayer(feature, sourceId, geometry) {
     var layer;
     if (geometry === 'LineString') {
         layer = {
@@ -74,7 +75,7 @@ function _makeLayer(feature, sourceId, geometry) {
     return layer;
 }
 
-function _makeSource(geojson, sourceId) {
+function makeSource(geojson, sourceId) {
     var sources = {
         [sourceId]: {
             type: 'geojson',
