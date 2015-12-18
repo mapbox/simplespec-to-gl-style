@@ -1,6 +1,6 @@
 {
   "name": "simplespec-to-gl-style",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Converts GeoJSON styled with simplestyle-spec to a GL Style",
   "main": "index.js",
   "scripts": {
