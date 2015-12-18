@@ -76,11 +76,10 @@ function makeLayer(feature, sourceId, geometry) {
 }
 
 function makeSource(geojson, sourceId) {
-    var sources = {
-        [sourceId]: {
-            type: 'geojson',
-            data: geojson
-        }
+    var sources = {};
+    sources[sourceId] = {
+        type: 'geojson',
+        data: geojson
     };
     return sources;
 }
