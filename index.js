@@ -44,7 +44,7 @@ function makeLayer(feature, sourceId, geometry) {
         layer = {
             type: 'line',
             source: sourceId,
-            id: feature.properties._id,
+            id: hat(),
             paint: {
                 'line-color': 'stroke' in feature.properties ? feature.properties.stroke : '#555555',
                 'line-opacity': 'stroke-opacity' in feature.properties ? feature.properties['stroke-opacity'] : 1.0,
@@ -60,7 +60,7 @@ function makeLayer(feature, sourceId, geometry) {
         layer = {
             type: 'fill',
             source: sourceId,
-            id: feature.properties._id,
+            id: hat(),
             paint: {
                 'fill-color': 'fill' in feature.properties ? feature.properties.fill : '#555555',
                 'fill-opacity': 'fill-opacity' in feature.properties ? feature.properties['fill-opacity'] : 0.5
