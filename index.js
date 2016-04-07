@@ -1,4 +1,9 @@
 var hat = require('hat');
+var markerSize = {
+    small: 0.5,
+    medium: 1,
+    large: 1.5
+};
 
 function convert(geojson) {
     var sourceId = hat();
@@ -52,6 +57,7 @@ function makeLayer(feature, sourceId, geometry) {
             id: hat(),
             layout: {
                 'icon-image': 'marker-symbol' in feature.properties ? feature.properties['marker-symbol'] : 'marker-15',
+                'icon-size': 'marker-size' in feature.properties && markerSize[feature.properties['marker-size']] ? markerSize[feature.properties['marker-size']] : 1,
             },
             filter: [
                 '==',
