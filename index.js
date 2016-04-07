@@ -21,6 +21,11 @@ function addLayers(geojson, sourceId, layers) {
         default: throw new Error('unknown or unsupported GeoJSON type');
         case 'Feature':
             switch (geojson.geometry.type) {
+                case 'Point':
+                    if (!geojson.properties) geojson.properties = {};
+                    geojson.properties._id = hat();
+                    layers.push(makeLayer(geojson, sourceId, 'Point'));
+                    break;
                 case 'LineString':
                     if (!geojson.properties) geojson.properties = {};
                     geojson.properties._id = hat();
@@ -40,7 +45,21 @@ function addLayers(geojson, sourceId, layers) {
 
 function makeLayer(feature, sourceId, geometry) {
     var layer;
-    if (geometry === 'LineString') {
+    if (geometry === 'Point') {
+        layer = {
+            type: 'symbol',
+            source: sourceId,
+            id: hat(),
+            layout: {
+                'icon-image': 'marker-symbol' in feature.properties ? feature.properties['marker-symbol'] : 'marker-15',
+            },
+            filter: [
+                '==',
+                '_id',
+                feature.properties._id
+            ]
+        };
+    } else if (geometry === 'LineString') {
         layer = {
             type: 'line',
             source: sourceId,
