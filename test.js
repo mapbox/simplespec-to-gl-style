@@ -6,6 +6,7 @@ var validFeatureCollectionWithNoProperties = {"type":"FeatureCollection","featur
 var invalidFeatureCollection = {"type":"FeatureCollection","foobar":[{"type":"Feature","properties":{"stroke":"#3eb367","stroke-width":2,"stroke-opacity":1},"geometry":{"type":"LineString","coordinates":[[40.78125,57.32652122521709],[10.546875,41.244772343082076],[57.65624999999999,18.312810846425442]]}},{"type":"Feature","properties":{"stroke":"#5bfa35","stroke-width":2,"stroke-opacity":1,"fill":"#b87acb","fill-opacity":0.5},"geometry":{"type":"Polygon","coordinates":[[[-23.5546875,23.88583769986199],[-31.640625,-8.05922962720018],[8.7890625,-8.05922962720018],[-23.5546875,23.88583769986199]]]}}]};
 var invalidFeatureCollectionType = {"type":"foobar","features":[{"type":"Feature","properties":{"stroke":"#3eb367","stroke-width":2,"stroke-opacity":1},"geometry":{"type":"LineString","coordinates":[[40.78125,57.32652122521709],[10.546875,41.244772343082076],[57.65624999999999,18.312810846425442]]}},{"type":"Feature","properties":{"stroke":"#5bfa35","stroke-width":2,"stroke-opacity":1,"fill":"#b87acb","fill-opacity":0.5},"geometry":{"type":"Polygon","coordinates":[[[-23.5546875,23.88583769986199],[-31.640625,-8.05922962720018],[8.7890625,-8.05922962720018],[-23.5546875,23.88583769986199]]]}}]};
 var point = {"type":"FeatureCollection","features":[{"type":"Feature","properties":{},"geometry":{"type":"Point","coordinates":[15.8203125,28.613459424004414]}}]};
+var pointWithImageAndSize = {"type":"FeatureCollection","features":[{"type":"Feature","properties":{"marker-color":"#7e7e7e","marker-symbol":"airport-11","marker-size":"large"},"geometry":{"type":"Point","coordinates":[28.4765625,16.63619187839765]}}]};
 var singleGeoJSONFeature = {"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[36.2109375,60.06484046010452],[-4.921875,47.98992166741417],[14.0625,3.8642546157214213],[61.52343749999999,16.63619187839765],[36.2109375,60.06484046010452]]]}};
 
 test('valid', function(t) {
@@ -60,7 +61,7 @@ test('valid with no properties', function(t) {
 
     t.end();
 });
-//
+
 test('valid single feature', function(t) {
     var style = simpleToGL(singleGeoJSONFeature);
     t.deepEqual(style.version, 8, 'Version should be 8');
@@ -82,12 +83,27 @@ test('valid single feature', function(t) {
     t.end();
 });
 
-test('invalid point', function(t) {
-    t.throws(function() {
-        var style = simpleToGL(point);
-    }, {
-      message: 'unknown or unsupported GeoJSON geometry type'
-    }, 'does not support point data')
+test('valid single point', function(t) {
+    var style = simpleToGL(point);
+    t.deepEqual(style.version, 8, 'Version should be 8');
+    t.deepEqual(style.layers[0].layout['icon-image'], 'marker-15', 'Default marker');
+    t.deepEqual(style.layers[0].layout['icon-size'], 1, 'Default size');
+    t.end();
+});
+
+test('valid single point with image', function(t) {
+    var style = simpleToGL(pointWithImageAndSize);
+    t.deepEqual(style.version, 8, 'Version should be 8');
+    t.deepEqual(style.layers[0].layout['icon-image'], 'airport-11', 'Custom marker');
+    t.deepEqual(style.layers[0].layout['icon-size'], 1.5, 'Custom size');
+    t.end();
+});
+
+test('invalid image size defaults to 1', function(t) {
+    var invalid = {"type":"FeatureCollection","features":[{"type":"Feature","properties":{"marker-color":"#7e7e7e","marker-size":"super-large"},"geometry":{"type":"Point","coordinates":[28.4765625,16.63619187839765]}}]};
+    var style = simpleToGL(invalid);
+    t.deepEqual(style.version, 8, 'Version should be 8');
+    t.deepEqual(style.layers[0].layout['icon-size'], 1, 'Default size');
     t.end();
 });
 
@@ -96,6 +112,6 @@ test('invalid FeatureCollection', function(t) {
         var style = simpleToGL(invalidFeatureCollectionType);
     }, {
       message: 'unknown or unsupported GeoJSON type'
-    }, 'Invalid GeoJSON type')
+    }, 'Invalid GeoJSON type');
     t.end();
 });
