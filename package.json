@@ -4,7 +4,7 @@
   "description": "Converts GeoJSON styled with simplestyle-spec to a GL Style",
   "main": "index.js",
   "scripts": {
-    "test": "tape ./test.js"
+    "test": "eslint index.js && tape ./test.js"
   },
   "author": "Bobby Sudekum",
   "license": "ISC",
@@ -12,6 +12,7 @@
     "hat": "0.0.3"
   },
   "devDependencies": {
+    "eslint": "^3.1.1",
     "tape": "^4.2.2"
   }
 }
