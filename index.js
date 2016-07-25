@@ -1,8 +1,8 @@
 var hat = require('hat');
 var markerSize = {
     small: 0.5,
-    medium: 1,
-    large: 1.5
+    medium: 0.75,
+    large: 1
 };
 
 function convert(geojson) {
@@ -29,6 +29,7 @@ function addLayers(geojson, sourceId, layers) {
                 case 'Point':
                     if (!geojson.properties) geojson.properties = {};
                     geojson.properties._id = hat();
+                    if ('marker-symbol' in geojson.properties) layers.push(makeLayer(geojson, sourceId, 'symbol-background'));
                     layers.push(makeLayer(geojson, sourceId, 'Point'));
                     break;
                 case 'LineString':
@@ -50,9 +51,23 @@ function addLayers(geojson, sourceId, layers) {
 
 function makeLayer(feature, sourceId, geometry) {
     var layer;
-    if (geometry === 'Point') {
+    if (geometry === 'symbol-background') { // Used for styling point background circle
         layer = {
-            type: 'symbol',
+            source: sourceId,
+            id: hat(),
+            type: 'circle',
+            paint: {
+                'circle-color': 'marker-color' in feature.properties ? feature.properties['marker-color'] : 'white',
+                'circle-radius': 'marker-size' in feature.properties && markerSize[feature.properties['marker-size']] ? markerSize[feature.properties['marker-size']] * 10 : 10
+            },
+            filter: [
+                '==',
+                '_id',
+                feature.properties._id
+            ]
+        };
+    } else if (geometry === 'Point') {
+        layer = {
             source: sourceId,
             id: hat(),
             filter: [
@@ -63,6 +78,7 @@ function makeLayer(feature, sourceId, geometry) {
         };
 
         if ('marker-symbol' in feature.properties) {
+            layer.type = 'symbol';
             layer.layout = {};
             layer.layout = {
                 'icon-image': feature.properties['marker-symbol'],
@@ -70,11 +86,13 @@ function makeLayer(feature, sourceId, geometry) {
             };
         } else {
             layer.paint = {};
+            layer.type = 'circle';
             layer.paint = {
                 'circle-color': 'marker-color' in feature.properties ? feature.properties['marker-color'] : '#555555',
                 'circle-radius': 'marker-size' in feature.properties && markerSize[feature.properties['marker-size']] ? feature.properties['marker-size'] * 5 : 5
             };
         }
+
     } else if (geometry === 'LineString') {
         layer = {
             type: 'line',
