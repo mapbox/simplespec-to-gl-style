@@ -11,7 +11,7 @@ var singleGeoJSONFeature = {"type":"Feature","properties":{},"geometry":{"type":
 
 test('valid', function(t) {
     var style = simpleToGL(validFeatureCollection);
-    t.deepEqual(style.version, 8, 'Version should be 8');
+    t.deepEqual(style.version, 9, 'Version should be 9');
 
     for (var key in style.sources) {
        var source = style.sources[key];
@@ -39,7 +39,7 @@ test('valid', function(t) {
 
 test('valid with no properties', function(t) {
     var style = simpleToGL(validFeatureCollectionWithNoProperties);
-    t.deepEqual(style.version, 8, 'Version should be 8');
+    t.deepEqual(style.version, 9, 'Version should be 9');
 
     for (var key in style.sources) {
        var source = style.sources[key];
@@ -64,7 +64,7 @@ test('valid with no properties', function(t) {
 
 test('valid single feature', function(t) {
     var style = simpleToGL(singleGeoJSONFeature);
-    t.deepEqual(style.version, 8, 'Version should be 8');
+    t.deepEqual(style.version, 9, 'Version should be 9');
 
     for (var key in style.sources) {
        var source = style.sources[key];
@@ -83,26 +83,26 @@ test('valid single feature', function(t) {
     t.end();
 });
 
-test('valid single point', function(t) {
+test('valid single point defaults to circle', function(t) {
     var style = simpleToGL(point);
-    t.deepEqual(style.version, 8, 'Version should be 8');
-    t.deepEqual(style.layers[0].layout['icon-image'], 'marker-15', 'Default marker');
-    t.deepEqual(style.layers[0].layout['icon-size'], 1, 'Default size');
+    t.deepEqual(style.version, 9, 'Version should be 9');
+    t.deepEqual(style.layers[0].paint['circle-radius'], 5, 'Default circle marker');
+    t.deepEqual(style.layers[0].paint['circle-color'], '#555555', 'Default size');
     t.end();
 });
 
 test('valid single point with image', function(t) {
     var style = simpleToGL(pointWithImageAndSize);
-    t.deepEqual(style.version, 8, 'Version should be 8');
+    t.deepEqual(style.version, 9, 'Version should be 9');
     t.deepEqual(style.layers[0].layout['icon-image'], 'airport-11', 'Custom marker');
     t.deepEqual(style.layers[0].layout['icon-size'], 1.5, 'Custom size');
     t.end();
 });
 
 test('invalid image size defaults to 1', function(t) {
-    var invalid = {"type":"FeatureCollection","features":[{"type":"Feature","properties":{"marker-color":"#7e7e7e","marker-size":"super-large"},"geometry":{"type":"Point","coordinates":[28.4765625,16.63619187839765]}}]};
+    var invalid = {"type":"FeatureCollection","features":[{"type":"Feature","properties":{"marker-color":"#7e7e7e","marker-symbol":"airport-11","marker-size":"super-large"},"geometry":{"type":"Point","coordinates":[28.4765625,16.63619187839765]}}]};
     var style = simpleToGL(invalid);
-    t.deepEqual(style.version, 8, 'Version should be 8');
+    t.deepEqual(style.version, 9, 'Version should be 9');
     t.deepEqual(style.layers[0].layout['icon-size'], 1, 'Default size');
     t.end();
 });
