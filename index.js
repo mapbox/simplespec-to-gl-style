@@ -12,7 +12,7 @@ function convert(geojson) {
         version: 8,
         sources: makeSource(geojson, sourceId),
         layers: addLayers(geojson, sourceId, []),
-        glyphs:'mapbox://fonts/mapbox/{fontstack}/{range}.pbf'
+        glyphs: 'mapbox://fonts/mapbox/{fontstack}/{range}.pbf'
     };
 
     return style;
@@ -21,7 +21,7 @@ function convert(geojson) {
 function addLayers(geojson, sourceId, layers) {
     switch (geojson.type) {
         case 'FeatureCollection':
-            geojson.features.forEach(function (feature) { addLayers(feature, sourceId, layers); });
+            geojson.features.forEach(function(feature) { addLayers(feature, sourceId, layers); });
             break;
         default: throw new Error('unknown or unsupported GeoJSON type');
         case 'Feature':
@@ -55,16 +55,26 @@ function makeLayer(feature, sourceId, geometry) {
             type: 'symbol',
             source: sourceId,
             id: hat(),
-            layout: {
-                'icon-image': 'marker-symbol' in feature.properties ? feature.properties['marker-symbol'] : 'marker-15',
-                'icon-size': 'marker-size' in feature.properties && markerSize[feature.properties['marker-size']] ? markerSize[feature.properties['marker-size']] : 1,
-            },
             filter: [
                 '==',
                 '_id',
                 feature.properties._id
             ]
         };
+
+        if ('marker-symbol' in feature.properties) {
+            layer.layout = {};
+            layer.layout = {
+                'icon-image': feature.properties['marker-symbol'],
+                'icon-size': 'marker-size' in feature.properties && markerSize[feature.properties['marker-size']] ? markerSize[feature.properties['marker-size']] : 1
+            };
+        } else {
+            layer.paint = {};
+            layer.paint = {
+                'circle-color': 'marker-color' in feature.properties ? feature.properties['marker-color'] : '#555555',
+                'circle-radius': 'marker-size' in feature.properties && markerSize[feature.properties['marker-size']] ? feature.properties['marker-size'] * 5 : 5
+            };
+        }
     } else if (geometry === 'LineString') {
         layer = {
             type: 'line',

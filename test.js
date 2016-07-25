@@ -83,11 +83,11 @@ test('valid single feature', function(t) {
     t.end();
 });
 
-test('valid single point', function(t) {
+test('valid single point defaults to circle', function(t) {
     var style = simpleToGL(point);
     t.deepEqual(style.version, 8, 'Version should be 8');
-    t.deepEqual(style.layers[0].layout['icon-image'], 'marker-15', 'Default marker');
-    t.deepEqual(style.layers[0].layout['icon-size'], 1, 'Default size');
+    t.deepEqual(style.layers[0].paint['circle-color'], '#555555', 'Default marker');
+    t.deepEqual(style.layers[0].paint['circle-radius'], 5, 'Default size');
     t.end();
 });
 
@@ -100,7 +100,7 @@ test('valid single point with image', function(t) {
 });
 
 test('invalid image size defaults to 1', function(t) {
-    var invalid = {"type":"FeatureCollection","features":[{"type":"Feature","properties":{"marker-color":"#7e7e7e","marker-size":"super-large"},"geometry":{"type":"Point","coordinates":[28.4765625,16.63619187839765]}}]};
+    var invalid = {"type":"FeatureCollection","features":[{"type":"Feature","properties":{"marker-color":"#7e7e7e","marker-symbol":"airport-11","marker-size":"super-large"},"geometry":{"type":"Point","coordinates":[28.4765625,16.63619187839765]}}]};
     var style = simpleToGL(invalid);
     t.deepEqual(style.version, 8, 'Version should be 8');
     t.deepEqual(style.layers[0].layout['icon-size'], 1, 'Default size');
