@@ -57,8 +57,8 @@ function makeLayer(feature, sourceId, geometry) {
             id: hat(),
             type: 'circle',
             paint: {
-                'circle-color': 'marker-color' in feature.properties ? feature.properties['marker-color'] : 'white',
-                'circle-radius': 'marker-size' in feature.properties && markerSize[feature.properties['marker-size']] ? markerSize[feature.properties['marker-size']] * 10 : 10
+                'circle-color': 'marker-color' in feature.properties ? feature.properties['marker-color'] : '#ddd',
+                'circle-radius': 'marker-size' in feature.properties && markerSize[feature.properties['marker-size']] ? markerSize[feature.properties['marker-size']] * 12 : 12
             },
             filter: [
                 '==',
@@ -81,7 +81,7 @@ function makeLayer(feature, sourceId, geometry) {
             layer.type = 'symbol';
             layer.layout = {};
             layer.layout = {
-                'icon-image': feature.properties['marker-symbol'],
+                'icon-image': feature.properties['marker-symbol'] + '-15',
                 'icon-size': 'marker-size' in feature.properties && markerSize[feature.properties['marker-size']] ? markerSize[feature.properties['marker-size']] : 1
             };
         } else {
