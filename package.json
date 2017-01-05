@@ -1,5 +1,5 @@
 {
-  "name": "simplespec-to-gl-style",
+  "name": "@mapbox/simplespec-to-gl-style",
   "version": "0.1.0",
   "description": "Converts GeoJSON styled with simplestyle-spec to a GL Style",
   "main": "index.js",

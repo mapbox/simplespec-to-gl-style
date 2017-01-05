@@ -2,11 +2,16 @@
 
 Converts GeoJSON styled with [simplestyle-spec](https://github.com/mapbox/simplestyle-spec/) to a GL Style
 
+## Install
+
+```
+npm install @mapbox/simplespec-to-gl-style --save
+```
 
 #### Usage:
 
 ```js
-var convert = require('simplespec-to-gl-style');
+var convert = require('@mapbox/simplespec-to-gl-style');
 
 var style = convert(myGeoJSON);
 
