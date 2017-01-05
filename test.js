@@ -85,26 +85,20 @@ test('valid single feature', function(t) {
     t.end();
 });
 
-test('valid single point defaults to circle', function(t) {
+test('valid single point defaults to point', function(t) {
     var style = simpleToGL(point);
     t.deepEqual(style.version, 8, 'Version should be 8');
-    t.deepEqual(style.layers[0].type, 'circle', 'Default circle');
-    t.deepEqual(style.layers[0].paint['circle-color'], '#555555', 'Default marker');
-    t.deepEqual(style.layers[0].paint['circle-radius'], 5, 'Default size');
+    t.deepEqual(style.layers[0].type, 'symbol', 'Default symbol');
+    t.deepEqual(style.layers[0].layout['icon-size'], 1);
     t.end();
 });
 
 test('valid single point with image', function(t) {
     var style = simpleToGL(pointWithImageAndSize);
     t.deepEqual(style.version, 8, 'Version should be 8');
-
-    t.deepEqual(style.layers[0].type, 'circle', 'Default circle');
-    t.deepEqual(style.layers[0].paint['circle-color'], '#7e7e7e', 'Default marker');
-    t.deepEqual(style.layers[0].paint['circle-radius'], 12, 'Default size');
-
-    t.deepEqual(style.layers[1].type, 'symbol');
-    t.deepEqual(style.layers[1].layout['icon-image'], 'airport-15', 'Custom marker');
-    t.deepEqual(style.layers[1].layout['icon-size'], 1, 'Custom size');
+    t.deepEqual(style.layers[0].type, 'symbol');
+    t.ok(style.layers[0].layout['icon-image'], 'Custom marker');
+    t.deepEqual(style.layers[0].layout['icon-size'], 1, 'Custom size');
 
     t.end();
 });
@@ -113,7 +107,7 @@ test('invalid image size defaults to 1', function(t) {
     var invalid = {"type":"FeatureCollection","features":[{"type":"Feature","properties":{"marker-color":"#7e7e7e","marker-symbol":"airport","marker-size":"super-large"},"geometry":{"type":"Point","coordinates":[28.4765625,16.63619187839765]}}]}; // eslint-disable-line
     var style = simpleToGL(invalid);
     t.deepEqual(style.version, 8, 'Version should be 8');
-    t.deepEqual(style.layers[1].layout['icon-size'], 1, 'Default size');
+    t.deepEqual(style.layers[0].layout['icon-size'], 1, 'Default size');
     t.end();
 });
 
