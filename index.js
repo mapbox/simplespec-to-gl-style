@@ -1,7 +1,7 @@
-var hat = require('hat');
+var cuid = require('cuid');
 
 function convert(geojson) {
-    var sourceId = hat();
+    var sourceId = cuid();
 
     var style = {
         version: 8,
@@ -23,17 +23,22 @@ function addLayers(geojson, sourceId, layers) {
             switch (geojson.geometry.type) {
                 case 'Point':
                     if (!geojson.properties) geojson.properties = {};
-                    geojson.properties._id = hat();
+                    geojson.properties._id = cuid();
                     layers.push(makeLayer(geojson, sourceId, 'Point'));
                     break;
                 case 'LineString':
                     if (!geojson.properties) geojson.properties = {};
-                    geojson.properties._id = hat();
+                    geojson.properties._id = cuid();
                     layers.push(makeLayer(geojson, sourceId, 'LineString'));
+
+                    // Encoded polylines can be rendered as polgons. If a LineString has fill properties, add them.
+                    if ('fill' in geojson.properties || 'fill-opacity' in geojson.properties) {
+                        layers.push(makeLayer(geojson, sourceId, 'Polygon'));
+                    }
                     break;
                 case 'Polygon':
                     if (!geojson.properties) geojson.properties = {};
-                    geojson.properties._id = hat();
+                    geojson.properties._id = cuid();
                     layers.push(makeLayer(geojson, sourceId, 'LineString'));
                     layers.push(makeLayer(geojson, sourceId, 'Polygon'));
                     break;
@@ -48,7 +53,7 @@ function makeLayer(feature, sourceId, geometry) {
     if (geometry === 'Point') {
         layer = {
             source: sourceId,
-            id: hat(),
+            id: cuid(),
             type: 'symbol',
             layout: {
                 'icon-image': feature.properties._id,
@@ -64,7 +69,7 @@ function makeLayer(feature, sourceId, geometry) {
         layer = {
             type: 'line',
             source: sourceId,
-            id: hat(),
+            id: cuid(),
             paint: {
                 'line-color': 'stroke' in feature.properties ? feature.properties.stroke : '#555555',
                 'line-opacity': 'stroke-opacity' in feature.properties ? +feature.properties['stroke-opacity'] : 1.0,
@@ -84,7 +89,7 @@ function makeLayer(feature, sourceId, geometry) {
         layer = {
             type: 'fill',
             source: sourceId,
-            id: hat(),
+            id: cuid(),
             paint: {
                 'fill-color': 'fill' in feature.properties ? feature.properties.fill : '#555555',
                 'fill-opacity': 'fill-opacity' in feature.properties ? +feature.properties['fill-opacity'] : 0.5
