@@ -1,7 +1,18 @@
+'use strict';
+
 var cuid = require('cuid');
 
 function convert(geojson) {
     var sourceId = cuid();
+
+    // If a LineString has fill properties, we need to add a source layer for it
+    if (geojson.features && geojson.features.length > 0) {
+        geojson.features = geojson.features.map(function(feature) {
+            return checkForLineAsPolygon(feature);
+        });
+    } else {
+        geojson = checkForLineAsPolygon(geojson);
+    }
 
     var style = {
         version: 8,
@@ -16,7 +27,9 @@ function convert(geojson) {
 function addLayers(geojson, sourceId, layers) {
     switch (geojson.type) {
         case 'FeatureCollection':
-            geojson.features.forEach(function(feature) { addLayers(feature, sourceId, layers); });
+            geojson.features.forEach(function(feature) {
+                addLayers(feature, sourceId, layers);
+            });
             break;
         default: throw new Error('unknown or unsupported GeoJSON type');
         case 'Feature':
@@ -30,11 +43,6 @@ function addLayers(geojson, sourceId, layers) {
                     if (!geojson.properties) geojson.properties = {};
                     geojson.properties._id = cuid();
                     layers.push(makeLayer(geojson, sourceId, 'LineString'));
-
-                    // Encoded polylines can be rendered as polgons. If a LineString has fill properties, add them.
-                    if ('fill' in geojson.properties || 'fill-opacity' in geojson.properties) {
-                        layers.push(makeLayer(geojson, sourceId, 'Polygon'));
-                    }
                     break;
                 case 'Polygon':
                     if (!geojson.properties) geojson.properties = {};
@@ -102,6 +110,28 @@ function makeLayer(feature, sourceId, geometry) {
         };
     }
     return layer;
+}
+
+function checkForLineAsPolygon(feature) {
+    if (feature.properties && feature.geometry.type === 'LineString' && ('fill' in feature.properties || 'fill-opacity' in feature.properties)) {
+        let coordinates = feature.geometry.coordinates;
+
+        // A polygon needs to have the the same first and last coordinates
+        coordinates.push(coordinates[0]);
+
+        return {
+            type: 'Feature',
+            properties: feature.properties || {},
+            geometry: {
+                type: 'Polygon',
+                coordinates: [
+                    coordinates
+                ]
+            }
+        };
+    } else {
+        return feature;
+    }
 }
 
 function makeSource(geojson, sourceId) {
