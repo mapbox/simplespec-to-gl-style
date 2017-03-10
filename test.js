@@ -119,3 +119,15 @@ test('invalid FeatureCollection', function(t) {
     }, 'Invalid GeoJSON type');
     t.end();
 });
+
+
+test('LineString with fill properties', function(t) {
+    var geojson = {"type":"FeatureCollection","features":[{"type":"Feature","properties":{"stroke-width":"2","stroke":"#000000","stroke-opacity":"1.0","fill":"#ff0000","fill-opacity":"0.25"},"geometry":{"type":"LineString","coordinates":[[-122.68209,45.52475],[-122.67488,45.52451],[-122.67608,45.51681],[-122.68998,45.51693],[-122.68964,45.5203],[-122.68209,45.52475]]}}]};  // eslint-disable-line
+    var style = simpleToGL(geojson);
+
+    t.equal(style.layers.length, 2, 'Has two layers');
+    t.equal(style.layers[1].type, 'fill');
+    t.equal(style.layers[1].paint['fill-color'], '#ff0000');
+    t.equal(style.layers[1].paint['fill-opacity'], 0.25);
+    t.end();
+});

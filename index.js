@@ -1,7 +1,18 @@
-var hat = require('hat');
+'use strict';
+
+var cuid = require('cuid');
 
 function convert(geojson) {
-    var sourceId = hat();
+    var sourceId = cuid();
+
+    // If a LineString has fill properties, we need to add a source layer for it
+    if (geojson.features && geojson.features.length > 0) {
+        geojson.features = geojson.features.map(function(feature) {
+            return checkForLineAsPolygon(feature);
+        });
+    } else {
+        geojson = checkForLineAsPolygon(geojson);
+    }
 
     var style = {
         version: 8,
@@ -16,24 +27,26 @@ function convert(geojson) {
 function addLayers(geojson, sourceId, layers) {
     switch (geojson.type) {
         case 'FeatureCollection':
-            geojson.features.forEach(function(feature) { addLayers(feature, sourceId, layers); });
+            geojson.features.forEach(function(feature) {
+                addLayers(feature, sourceId, layers);
+            });
             break;
         default: throw new Error('unknown or unsupported GeoJSON type');
         case 'Feature':
             switch (geojson.geometry.type) {
                 case 'Point':
                     if (!geojson.properties) geojson.properties = {};
-                    geojson.properties._id = hat();
+                    geojson.properties._id = cuid();
                     layers.push(makeLayer(geojson, sourceId, 'Point'));
                     break;
                 case 'LineString':
                     if (!geojson.properties) geojson.properties = {};
-                    geojson.properties._id = hat();
+                    geojson.properties._id = cuid();
                     layers.push(makeLayer(geojson, sourceId, 'LineString'));
                     break;
                 case 'Polygon':
                     if (!geojson.properties) geojson.properties = {};
-                    geojson.properties._id = hat();
+                    geojson.properties._id = cuid();
                     layers.push(makeLayer(geojson, sourceId, 'LineString'));
                     layers.push(makeLayer(geojson, sourceId, 'Polygon'));
                     break;
@@ -48,7 +61,7 @@ function makeLayer(feature, sourceId, geometry) {
     if (geometry === 'Point') {
         layer = {
             source: sourceId,
-            id: hat(),
+            id: cuid(),
             type: 'symbol',
             layout: {
                 'icon-image': feature.properties._id,
@@ -64,7 +77,7 @@ function makeLayer(feature, sourceId, geometry) {
         layer = {
             type: 'line',
             source: sourceId,
-            id: hat(),
+            id: cuid(),
             paint: {
                 'line-color': 'stroke' in feature.properties ? feature.properties.stroke : '#555555',
                 'line-opacity': 'stroke-opacity' in feature.properties ? +feature.properties['stroke-opacity'] : 1.0,
@@ -84,7 +97,7 @@ function makeLayer(feature, sourceId, geometry) {
         layer = {
             type: 'fill',
             source: sourceId,
-            id: hat(),
+            id: cuid(),
             paint: {
                 'fill-color': 'fill' in feature.properties ? feature.properties.fill : '#555555',
                 'fill-opacity': 'fill-opacity' in feature.properties ? +feature.properties['fill-opacity'] : 0.5
@@ -97,6 +110,28 @@ function makeLayer(feature, sourceId, geometry) {
         };
     }
     return layer;
+}
+
+function checkForLineAsPolygon(feature) {
+    if (feature.properties && feature.geometry.type === 'LineString' && ('fill' in feature.properties || 'fill-opacity' in feature.properties)) {
+        let coordinates = feature.geometry.coordinates;
+
+        // A polygon needs to have the the same first and last coordinates
+        coordinates.push(coordinates[0]);
+
+        return {
+            type: 'Feature',
+            properties: feature.properties || {},
+            geometry: {
+                type: 'Polygon',
+                coordinates: [
+                    coordinates
+                ]
+            }
+        };
+    } else {
+        return feature;
+    }
 }
 
 function makeSource(geojson, sourceId) {
