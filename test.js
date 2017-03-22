@@ -98,6 +98,7 @@ test('valid single point with image', function(t) {
     t.deepEqual(style.version, 8, 'Version should be 8');
     t.deepEqual(style.layers[0].type, 'symbol');
     t.ok(style.layers[0].layout['icon-image'], 'Custom marker');
+    t.ok(style.layers[0].layout['icon-allow-overlap'], 'Allow marker overlap');
     t.deepEqual(style.layers[0].layout['icon-size'], 1, 'Custom size');
 
     t.end();
