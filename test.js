@@ -9,6 +9,7 @@ var invalidFeatureCollectionType = {"type":"foobar","features":[{"type":"Feature
 var point = {"type":"FeatureCollection","features":[{"type":"Feature","properties":{},"geometry":{"type":"Point","coordinates":[15.8203125,28.613459424004414]}}]};
 var pointWithImageAndSize = {"type":"FeatureCollection","features":[{"type":"Feature","properties":{"marker-color":"#7e7e7e","marker-symbol":"airport","marker-size":"large"},"geometry":{"type":"Point","coordinates":[28.4765625,16.63619187839765]}}]};
 var singleGeoJSONFeature = {"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[36.2109375,60.06484046010452],[-4.921875,47.98992166741417],[14.0625,3.8642546157214213],[61.52343749999999,16.63619187839765],[36.2109375,60.06484046010452]]]}};
+var multiPolygon = {"type":"FeatureCollection","features":[{"type":"Feature","properties":{},"geometry":{"type":"MultiPolygon","coordinates":[[[[-84.71239,39.052056],[-84.368778,39.052056],[-84.368778,39.221037],[-84.71239,39.221037],[-84.71239,39.052056]]]]}}]};
 /* eslint-enable */
 
 test('valid', function(t) {
@@ -60,6 +61,27 @@ test('valid with no properties', function(t) {
 
     t.deepEqual(style.layers[2].paint['fill-color'], '#555555', 'Polyong fill-color is default value');
     t.deepEqual(style.layers[2].paint['fill-opacity'], 0.5, 'Polyong fill-opacity is default value');
+
+    t.end();
+});
+
+test('valid multiPolygon no properties', function(t) {
+    var style = simpleToGL(multiPolygon);
+    t.deepEqual(style.version, 8, 'Version should be 8');
+
+    for (var key in style.sources) {
+       var source = style.sources[key];
+       for (var i = 0; i < source.data.features.length; i++) {
+           t.deepEqual(style.layers[i].filter[2], source.data.features[i].properties._id, 'ids match between geojson source and layer');
+       }
+    }
+
+    t.deepEqual(style.layers[0].paint['line-color'], '#555555', 'LineString line-color is default value');
+    t.deepEqual(style.layers[0].paint['line-opacity'], 1.0, 'LineString line-opacity is default value');
+    t.deepEqual(style.layers[0].paint['line-width'], 2.0, 'LineString line-width is default value');
+
+    t.deepEqual(style.layers[1].paint['fill-color'], '#555555', 'Polygon fill-color is default value');
+    t.deepEqual(style.layers[1].paint['fill-opacity'], 0.5, 'Polygon fill-opacity is default value');
 
     t.end();
 });

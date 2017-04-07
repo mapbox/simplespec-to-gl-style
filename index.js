@@ -34,16 +34,19 @@ function addLayers(geojson, sourceId, layers) {
         default: throw new Error('unknown or unsupported GeoJSON type');
         case 'Feature':
             switch (geojson.geometry.type) {
+                case 'MultiPoint':
                 case 'Point':
                     if (!geojson.properties) geojson.properties = {};
                     geojson.properties._id = cuid();
                     layers.push(makeLayer(geojson, sourceId, 'Point'));
                     break;
+                case 'MultiLineString':
                 case 'LineString':
                     if (!geojson.properties) geojson.properties = {};
                     geojson.properties._id = cuid();
                     layers.push(makeLayer(geojson, sourceId, 'LineString'));
                     break;
+                case 'MultiPolygon':
                 case 'Polygon':
                     if (!geojson.properties) geojson.properties = {};
                     geojson.properties._id = cuid();
