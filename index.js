@@ -27,7 +27,11 @@ function convert(geojson) {
 function addLayers(geojson, sourceId, layers) {
     switch (geojson.type) {
         case 'FeatureCollection':
-            geojson.features.forEach(function(feature) {
+            var order = { LineString: 0, MultiLineString: 1, Polygon: 2, MultiPolygon: 3, MultiPoint: 4, Point: 5 };
+            var sorted = geojson.features.sort(function sort(a, b) {
+                return order[a.type] - order[b.type];
+            });
+            sorted.forEach(function(feature) {
                 addLayers(feature, sourceId, layers);
             });
             break;
