@@ -69,7 +69,8 @@ function makeLayer(feature, sourceId, geometry) {
             layout: {
                 'icon-image': feature.properties._id,
                 'icon-size': 1,
-                'icon-allow-overlap': true
+                'icon-allow-overlap': true,
+                'icon-ignore-placement': true
             },
             filter: [
                 '==',
